@@ -1,14 +1,11 @@
-CREATE DATABASE IF NOT EXISTS bookmanage;
-USE bookmanage;
-
-CREATE TABLE IF NOT EXISTS books (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  author VARCHAR(255) NOT NULL,
-  isbn VARCHAR(20) UNIQUE,
-  publication_date DATE,
-  genre VARCHAR(100),
-  description TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE books (
+    book_id VARCHAR(50) PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    isbn VARCHAR(20),
+    publisher_id VARCHAR(50),
+    publication_year YEAR,
+    total_stock INT DEFAULT 0,
+    current_stock INT DEFAULT 0,
+    location VARCHAR(100),
+    FOREIGN KEY (publisher_id) REFERENCES publishers(publisher_id)
 );
