@@ -2,7 +2,6 @@
 // 创建Express应用
 
 const express = require('express');
-const mysql = require('mysql2');
 const cors = require('cors');
 
 // 加载环境变量
@@ -15,24 +14,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 创建MySQL连接池
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 3306,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+// 导入路由
+const bookRoutes = require('./routes/bookRoutes');
+const userRoutes = require('./routes/userRoutes');
+const borrowRoutes = require('./routes/borrowRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
+// 使用路由
+app.use('/api/books', bookRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/borrow', borrowRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 测试数据库连接
 app.get('/connect', (req, res) => {
     res.send('图书管理系统服务器已连接');
 });
 
-const port  = process.env.DB_PORT || 3306;
-app.listen(port, () =>{
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
     console.log(`服务器正在运行，监听端口 ${port}`);
 });
