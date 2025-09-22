@@ -23,7 +23,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：借书失败';
+        SET p_result_message = 'System error: Failed to borrow book';
         SET p_record_id = '';
     END;
     
@@ -44,15 +44,15 @@ BEGIN
     
     IF v_borrowing_status IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '用户不存在';
+        SET p_result_message = 'User does not exist';
         ROLLBACK;
     ELSEIF v_borrowing_status = 'suspended' THEN
         SET p_result_code = 2;
-        SET p_result_message = '用户账户已被冻结';
+        SET p_result_message = 'User account has been suspended';
         ROLLBACK;
     ELSEIF v_borrowed_count >= v_max_borrow_count THEN
         SET p_result_code = 3;
-        SET p_result_message = '已达到最大借阅数量';
+        SET p_result_message = 'Maximum borrowing limit reached';
         ROLLBACK;
     ELSE
         -- 检查图书库存
@@ -62,11 +62,11 @@ BEGIN
         
         IF v_current_stock IS NULL THEN
             SET p_result_code = 4;
-            SET p_result_message = '图书不存在';
+            SET p_result_message = 'Book does not exist';
             ROLLBACK;
         ELSEIF v_current_stock <= 0 THEN
             SET p_result_code = 5;
-            SET p_result_message = '图书库存不足';
+            SET p_result_message = 'Insufficient book stock';
             ROLLBACK;
         ELSE
             -- 生成借阅记录ID
@@ -100,7 +100,7 @@ BEGIN
             -- 提交事务
             COMMIT;
             SET p_result_code = 0;
-            SET p_result_message = '借书成功';
+            SET p_result_message = 'Book borrowed successfully';
             SET p_record_id = v_record_id;
         END IF;
     END IF;

@@ -19,7 +19,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：操作失败';
+        SET p_result_message = 'System error: Operation failed';
     END;
     
     -- 初始化返回值
@@ -37,11 +37,11 @@ BEGIN
     
     IF v_super_admin_type IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '超级管理员不存在';
+        SET p_result_message = 'Super admin does not exist';
         ROLLBACK;
     ELSEIF v_super_admin_type != '超级管理员' THEN
         SET p_result_code = 2;
-        SET p_result_message = '权限不足，只有超级管理员可以管理管理员';
+        SET p_result_message = 'Insufficient permissions, only super admins can manage admins';
         ROLLBACK;
     ELSE
         -- 检查要操作的管理员是否存在
@@ -51,7 +51,7 @@ BEGIN
         
         IF v_admin_current_type IS NULL THEN
             SET p_result_code = 3;
-            SET p_result_message = '用户不存在';
+            SET p_result_message = 'User does not exist';
             ROLLBACK;
         ELSE
             -- 执行操作
@@ -60,7 +60,7 @@ BEGIN
                     -- 检查用户是否已经是管理员或更高权限
                     IF v_admin_current_type = 4 OR v_admin_current_type = 5 THEN
                         SET p_result_code = 4;
-                        SET p_result_message = '用户已经是管理员或超级管理员';
+                        SET p_result_message = 'User is already an admin or super admin';
                         ROLLBACK;
                     ELSE
                         -- 提升为管理员
@@ -69,14 +69,14 @@ BEGIN
                         WHERE uid = p_admin_id;
                         
                         SET p_result_code = 0;
-                        SET p_result_message = '用户已提升为管理员';
+                        SET p_result_message = 'User has been promoted to admin';
                     END IF;
                     
                 WHEN 'demote' THEN
                     -- 检查用户是否是管理员
                     IF v_admin_current_type != 4 THEN
                         SET p_result_code = 5;
-                        SET p_result_message = '用户不是管理员';
+                        SET p_result_message = 'User is not an admin';
                         ROLLBACK;
                     ELSE
                         -- 降级为普通用户（学生）
@@ -85,14 +85,14 @@ BEGIN
                         WHERE uid = p_admin_id;
                         
                         SET p_result_code = 0;
-                        SET p_result_message = '管理员已降级为普通用户';
+                        SET p_result_message = 'Admin has been demoted to regular user';
                     END IF;
                     
                 WHEN 'freeze' THEN
                     -- 检查用户是否是管理员
                     IF v_admin_current_type != 4 AND v_admin_current_type != 5 THEN
                         SET p_result_code = 6;
-                        SET p_result_message = '用户不是管理员';
+                        SET p_result_message = 'User is not an admin';
                         ROLLBACK;
                     ELSE
                         -- 冻结管理员账户
@@ -101,14 +101,14 @@ BEGIN
                         WHERE uid = p_admin_id;
                         
                         SET p_result_code = 0;
-                        SET p_result_message = '管理员账户已冻结';
+                        SET p_result_message = 'Admin account has been suspended';
                     END IF;
                     
                 WHEN 'unfreeze' THEN
                     -- 检查用户是否是管理员
                     IF v_admin_current_type != 4 AND v_admin_current_type != 5 THEN
                         SET p_result_code = 7;
-                        SET p_result_message = '用户不是管理员';
+                        SET p_result_message = 'User is not an admin';
                         ROLLBACK;
                     ELSE
                         -- 解冻管理员账户
@@ -117,12 +117,12 @@ BEGIN
                         WHERE uid = p_admin_id;
                         
                         SET p_result_code = 0;
-                        SET p_result_message = '管理员账户已解冻';
+                        SET p_result_message = 'Admin account has been unsuspended';
                     END IF;
                     
                 ELSE
                     SET p_result_code = 8;
-                    SET p_result_message = '无效操作';
+                    SET p_result_message = 'Invalid operation';
                     ROLLBACK;
             END CASE;
             

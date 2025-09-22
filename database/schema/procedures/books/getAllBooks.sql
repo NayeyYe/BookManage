@@ -11,7 +11,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：查询失败';
+        SET p_result_message = 'System error: Query failed';
     END;
     
     -- 初始化返回值

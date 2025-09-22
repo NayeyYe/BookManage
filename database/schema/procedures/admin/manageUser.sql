@@ -17,7 +17,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：操作失败';
+        SET p_result_message = 'System error: Operation failed';
     END;
     
     -- 初始化返回值
@@ -35,17 +35,17 @@ BEGIN
     
     IF v_admin_type IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '管理员不存在';
+        SET p_result_message = 'Admin does not exist';
         ROLLBACK;
     ELSEIF v_admin_type != '管理员' AND v_admin_type != '超级管理员' THEN
         SET p_result_code = 2;
-        SET p_result_message = '权限不足';
+        SET p_result_message = 'Insufficient permissions';
         ROLLBACK;
     ELSE
         -- 检查用户是否存在
         IF NOT EXISTS (SELECT 1 FROM borrowers WHERE uid = p_user_id) THEN
             SET p_result_code = 3;
-            SET p_result_message = '用户不存在';
+            SET p_result_message = 'User does not exist';
             ROLLBACK;
         ELSE
             -- 执行操作
@@ -55,17 +55,17 @@ BEGIN
                 WHERE uid = p_user_id;
                 
                 SET p_result_code = 0;
-                SET p_result_message = '用户账户已冻结';
+                SET p_result_message = 'User account has been suspended';
             ELSEIF p_action = 'unfreeze' THEN
                 UPDATE borrowers
                 SET borrowing_status = 'active'
                 WHERE uid = p_user_id;
                 
                 SET p_result_code = 0;
-                SET p_result_message = '用户账户已解冻';
+                SET p_result_message = 'User account has been unsuspended';
             ELSE
                 SET p_result_code = 4;
-                SET p_result_message = '无效操作';
+                SET p_result_message = 'Invalid operation';
                 ROLLBACK;
             END IF;
             

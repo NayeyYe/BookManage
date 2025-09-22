@@ -23,7 +23,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误';
+        SET p_result_message = 'System error';
     END;
     
     -- 初始化返回值
@@ -43,17 +43,17 @@ BEGIN
     -- 如果用户不存在
     IF v_password_hash IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '用户不存在';
+        SET p_result_message = 'User does not exist';
     ELSE
         -- 验证密码（这里假设密码在应用层已经哈希处理）
         IF v_password_hash != p_password THEN
             SET p_result_code = 2;
-            SET p_result_message = '密码错误';
+            SET p_result_message = 'Incorrect password';
         ELSE
             -- 检查用户状态
             IF v_borrowing_status = 'suspended' THEN
                 SET p_result_code = 3;
-                SET p_result_message = '账户已被冻结';
+                SET p_result_message = 'Account has been suspended';
             ELSE
                 -- 获取用户类型名称
                 SELECT type_name INTO v_user_type
@@ -62,7 +62,7 @@ BEGIN
                 
                 -- 登录成功
                 SET p_result_code = 0;
-                SET p_result_message = '登录成功';
+                SET p_result_message = 'Login successful';
                 SET p_user_name = v_user_name;
                 SET p_user_type = v_user_type;
                 SET p_borrowing_status = v_borrowing_status;

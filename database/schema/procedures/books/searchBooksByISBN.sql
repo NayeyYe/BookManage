@@ -12,7 +12,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：查询失败';
+        SET p_result_message = 'System error: Query failed';
     END;
     
     -- 初始化返回值
@@ -22,7 +22,7 @@ BEGIN
     -- 检查ISBN是否为空
     IF p_isbn IS NULL OR p_isbn = '' THEN
         SET p_result_code = 1;
-        SET p_result_message = 'ISBN不能为空';
+        SET p_result_message = 'ISBN cannot be empty';
     ELSE
         -- 按ISBN搜索图书
         SELECT 

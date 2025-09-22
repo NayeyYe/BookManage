@@ -20,7 +20,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：更新图书失败';
+        SET p_result_message = 'System error: Failed to update book';
     END;
     
     -- 初始化返回值
@@ -33,7 +33,7 @@ BEGIN
     -- 检查图书是否存在
     IF NOT EXISTS (SELECT 1 FROM books WHERE book_id = p_book_id) THEN
         SET p_result_code = 1;
-        SET p_result_message = '图书未找到';
+        SET p_result_message = 'Book not found';
         ROLLBACK;
     ELSE
         -- 更新图书信息
@@ -50,7 +50,7 @@ BEGIN
         -- 提交事务
         COMMIT;
         SET p_result_code = 0;
-        SET p_result_message = '图书更新成功';
+        SET p_result_message = 'Book updated successfully';
     END IF;
 END//
 

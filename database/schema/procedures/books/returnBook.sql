@@ -23,7 +23,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：还书失败';
+        SET p_result_message = 'System error: Failed to return book';
         SET p_overdue_days = 0;
         SET p_fine_amount = 0.00;
         SET p_fine_record_id = '';
@@ -49,7 +49,7 @@ BEGIN
     
     IF v_borrower_id IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '借阅记录不存在或已归还';
+        SET p_result_message = 'Borrowing record does not exist or has been returned';
         ROLLBACK;
     ELSE
         -- 计算逾期天数
@@ -92,7 +92,7 @@ BEGIN
         
         -- 提交事务
         COMMIT;
-        SET p_result_message = '还书成功';
+        SET p_result_message = 'Book returned successfully';
     END IF;
 END//
 

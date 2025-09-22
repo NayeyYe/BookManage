@@ -12,7 +12,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：查询失败';
+        SET p_result_message = 'System error: Query failed';
     END;
     
     -- 初始化返回值
@@ -22,7 +22,7 @@ BEGIN
     -- 检查搜索关键字是否为空
     IF p_book_name IS NULL OR p_book_name = '' THEN
         SET p_result_code = 1;
-        SET p_result_message = '搜索关键字不能为空';
+        SET p_result_message = 'Search keyword cannot be empty';
     ELSE
         -- 按书名搜索图书
         SELECT 

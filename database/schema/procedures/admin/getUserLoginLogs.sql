@@ -14,7 +14,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：查询失败';
+        SET p_result_message = 'System error: Query failed';
     END;
     
     -- 初始化返回值
@@ -29,10 +29,10 @@ BEGIN
     
     IF v_admin_type IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '管理员不存在';
+        SET p_result_message = 'Admin does not exist';
     ELSEIF v_admin_type != '管理员' AND v_admin_type != '超级管理员' THEN
         SET p_result_code = 2;
-        SET p_result_message = '权限不足';
+        SET p_result_message = 'Insufficient permissions';
     ELSE
         -- 查询用户登录日志
         SELECT 

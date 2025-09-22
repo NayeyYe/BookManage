@@ -12,7 +12,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：查询用户信息失败';
+        SET p_result_message = 'System error: Failed to query user information';
     END;
     
     -- 初始化返回值
@@ -22,7 +22,7 @@ BEGIN
     -- 检查用户是否存在
     IF NOT EXISTS (SELECT 1 FROM borrowers WHERE uid = p_user_id) THEN
         SET p_result_code = 1;
-        SET p_result_message = '用户未找到';
+        SET p_result_message = 'User not found';
     ELSE
         -- 获取用户信息
         SELECT b.*, ut.type_name as identity_type_name 
