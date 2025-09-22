@@ -56,13 +56,24 @@ SOURCE schema/procedures/books/searchBooksByISBN.sql;
 SOURCE schema/procedures/books/searchBooksByName.sql;
 SOURCE schema/procedures/books/searchBooksByPublisher.sql;
 SOURCE schema/procedures/books/searchBooksByTag.sql;
+SOURCE schema/procedures/books/searchBooks.sql;
+SOURCE schema/procedures/books/getAllBooks.sql;
+SOURCE schema/procedures/books/getBookById.sql;
+SOURCE schema/procedures/books/updateBook.sql;
+SOURCE schema/procedures/books/deleteBook.sql;
 SOURCE schema/procedures/users/getUserAllBorrowingRecords.sql;
 SOURCE schema/procedures/users/getUserCurrentBorrowingRecords.sql;
 SOURCE schema/procedures/users/getUserFineRecords.sql;
+SOURCE schema/procedures/users/getUserById.sql;
+SOURCE schema/procedures/users/updateUser.sql;
 SOURCE schema/procedures/admin/getAllBorrowingRecords.sql;
+SOURCE schema/procedures/admin/getAllBorrowingRecordsDetailed.sql;
 SOURCE schema/procedures/admin/getAllFineRecords.sql;
+SOURCE schema/procedures/admin/getAllFineRecordsDetailed.sql;
 SOURCE schema/procedures/admin/getUserLoginLogs.sql;
+SOURCE schema/procedures/admin/getUserLoginLogsDetailed.sql;
 SOURCE schema/procedures/admin/manageUser.sql;
+SOURCE schema/procedures/admin/manageUserComplete.sql;
 SOURCE schema/procedures/admin/manageAdmin.sql;
 
 -- 创建触发器
