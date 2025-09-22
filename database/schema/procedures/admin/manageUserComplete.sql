@@ -14,7 +14,7 @@ BEGIN
     BEGIN
         ROLLBACK;
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：管理用户失败';
+        SET p_result_message = 'System error: Failed to manage users';
     END;
     
     -- 初始化返回值
@@ -24,18 +24,18 @@ BEGIN
     -- 检查用户是否存在
     IF NOT EXISTS (SELECT 1 FROM borrowers WHERE uid = p_uid) THEN
         SET p_result_code = 1;
-        SET p_result_message = '用户不存在';
+        SET p_result_message = 'The user does not exist.';
     ELSE
         CASE p_action
             WHEN 'activate' THEN
                 -- 激活用户
                 UPDATE borrowers SET borrowing_status = 'active' WHERE uid = p_uid;
-                SET p_result_message = '用户已激活';
+                SET p_result_message = 'The user has been activated';
                 
             WHEN 'suspend' THEN
                 -- 冻结用户
                 UPDATE borrowers SET borrowing_status = 'suspended' WHERE uid = p_uid;
-                SET p_result_message = '用户已冻结';
+                SET p_result_message = 'The user has been frozen';
                 
             WHEN 'delete' THEN
                 -- 开始事务
@@ -58,11 +58,11 @@ BEGIN
                 
                 -- 提交事务
                 COMMIT;
-                SET p_result_message = '用户已删除';
+                SET p_result_message = 'The user has been deleted.';
                 
             ELSE
                 SET p_result_code = 2;
-                SET p_result_message = '无效的操作';
+                SET p_result_message = 'Invalid operation';
         END CASE;
     END IF;
 END//

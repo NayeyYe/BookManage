@@ -11,7 +11,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：获取罚款记录失败';
+        SET p_result_message = 'System error: Failed to obtain the fine record';
     END;
     
     -- 初始化返回值

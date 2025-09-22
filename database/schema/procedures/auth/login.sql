@@ -21,7 +21,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：登录失败';
+        SET p_result_message = 'System error: Login failed';
         SET p_password_hash = '';
         SET p_name = '';
         SET p_phone = '';
@@ -55,9 +55,9 @@ BEGIN
     -- 检查用户是否存在
     IF v_user_exists IS NULL THEN
         SET p_result_code = 1;
-        SET p_result_message = '用户不存在';
+        SET p_result_message = 'The user does not exist';
     ELSE
-        SET p_result_message = '用户信息获取成功';
+        SET p_result_message = 'The user information was successfully obtained';
     END IF;
 END//
 

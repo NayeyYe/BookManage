@@ -11,7 +11,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：获取登录日志失败';
+        SET p_result_message = 'System error: Failed to obtain the login log';
     END;
     
     -- 初始化返回值

@@ -11,7 +11,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：获取借阅记录失败';
+        SET p_result_message = 'System error: Failed to obtain borrowing records';
     END;
     
     -- 初始化返回值

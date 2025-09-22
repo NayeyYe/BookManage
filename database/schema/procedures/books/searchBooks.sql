@@ -12,7 +12,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：搜索图书失败';
+        SET p_result_message = 'System error: Failed to search for books';
     END;
     
     -- 初始化返回值
