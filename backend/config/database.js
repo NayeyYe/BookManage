@@ -1,5 +1,5 @@
 const mysql = require('mysql2');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 // 创建MySQL连接池
 const pool = mysql.createPool({
