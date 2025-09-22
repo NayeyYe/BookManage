@@ -8,41 +8,18 @@ const register = async (req, res) => {
         const { uid, name, phone, identity_type, student_id, employee_id, password } = req.body;
         const connection = await getConnection();
         
-        // 检查用户是否已存在
-        const [existing] = await connection.execute('SELECT uid FROM borrowers WHERE uid = ?', [uid]);
-        if (existing.length > 0) {
-            return res.status(400).json({ error: '用户ID已存在' });
+        // 调用存储过程用户注册
+        await connection.execute(
+            'CALL userRegister(?, ?, ?, ?, ?, ?, ?, @result_code, @result_message)',
+            [uid, name, phone, identity_type, student_id, employee_id, password]
+        );
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code !== 0) {
+            return res.status(400).json({ error: result[0].result_message });
         }
         
-        // 密码加密
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        
-        // 开始事务
-        await connection.beginTransaction();
-        
-        try {
-            // 插入借阅者信息
-            await connection.execute(
-                'INSERT INTO borrowers (uid, name, phone, identity_type, student_id, employee_id, borrowed_count, registration_date, borrowing_status) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)',
-                [uid, name, phone, identity_type, student_id, employee_id, 0, 'active']
-            );
-            
-            // 插入用户认证信息
-            await connection.execute(
-                'INSERT INTO user_auth (user_id, password_hash) VALUES (?, ?)',
-                [uid, hashedPassword]
-            );
-            
-            // 提交事务
-            await connection.commit();
-            
-            res.status(201).json({ message: '用户注册成功' });
-        } catch (error) {
-            // 回滚事务
-            await connection.rollback();
-            throw error;
-        }
+        res.status(201).json({ message: result[0].result_message });
     } catch (error) {
         console.error('用户注册失败:', error);
         res.status(500).json({ error: '用户注册失败' });
@@ -55,55 +32,35 @@ const login = async (req, res) => {
         const { uid, password } = req.body;
         const connection = await getConnection();
         
-        // 获取用户信息
-        const [users] = await connection.execute(
-            'SELECT b.*, ua.password_hash FROM borrowers b JOIN user_auth ua ON b.uid = ua.user_id WHERE b.uid = ?',
-            [uid]
-        );
+        // 调用存储过程用户登录
+        await connection.execute('CALL userLogin(?, ?, @result_code, @result_message, @user_data)', [uid, password]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message, @user_data as user_data');
         
-        if (users.length === 0) {
-            return res.status(401).json({ error: '用户不存在' });
+        if (result[0].result_code !== 0) {
+            return res.status(401).json({ error: result[0].result_message });
         }
         
-        const user = users[0];
-        
-        // 验证密码
-        const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: '密码错误' });
-        }
-        
-        // 检查账户状态
-        if (user.borrowing_status === 'suspended') {
-            return res.status(401).json({ error: '账户已被冻结' });
-        }
+        // 解析用户数据
+        const userData = JSON.parse(result[0].user_data);
         
         // 生成JWT令牌
         const token = jwt.sign(
-            { uid: user.uid, name: user.name, identity_type: user.identity_type },
+            { uid: userData.uid, name: userData.name, identity_type: userData.identity_type },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
         
-        // 获取用户类型名称
-        const [userTypes] = await connection.execute(
-            'SELECT type_name FROM user_types WHERE type_id = ?',
-            [user.identity_type]
-        );
-        
-        const userTypeName = userTypes.length > 0 ? userTypes[0].type_name : '未知';
-        
         res.json({
-            message: '登录成功',
+            message: result[0].result_message,
             token,
             user: {
-                uid: user.uid,
-                name: user.name,
-                phone: user.phone,
-                identity_type: user.identity_type,
-                identity_type_name: userTypeName,
-                borrowing_status: user.borrowing_status,
-                borrowed_count: user.borrowed_count
+                uid: userData.uid,
+                name: userData.name,
+                phone: userData.phone,
+                identity_type: userData.identity_type,
+                identity_type_name: userData.identity_type_name,
+                borrowing_status: userData.borrowing_status,
+                borrowed_count: userData.borrowed_count
             }
         });
     } catch (error) {
@@ -118,6 +75,17 @@ const getUserById = async (req, res) => {
         const { id } = req.params;
         const connection = await getConnection();
         
+        // 调用存储过程获取用户信息
+        await connection.execute('CALL getUserById(?, @result_code, @result_message)', [id]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT b.*, ut.type_name as identity_type_name 
             FROM borrowers b 
@@ -143,19 +111,17 @@ const updateUser = async (req, res) => {
         const { name, phone } = req.body;
         const connection = await getConnection();
         
-        // 检查用户是否存在
-        const [existing] = await connection.execute('SELECT uid FROM borrowers WHERE uid = ?', [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ error: '用户未找到' });
+        // 调用存储过程更新用户信息
+        await connection.execute('CALL updateUser(?, ?, ?, @result_code, @result_message)', [id, name, phone]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
         }
         
-        // 更新用户信息
-        const [result] = await connection.execute(
-            'UPDATE borrowers SET name = ?, phone = ? WHERE uid = ?',
-            [name, phone, id]
-        );
-        
-        res.json({ message: '用户信息更新成功', affectedRows: result.affectedRows });
+        res.json({ message: result[0].result_message, affectedRows: 1 });
     } catch (error) {
         console.error('更新用户信息失败:', error);
         res.status(500).json({ error: '更新用户信息失败' });
@@ -168,12 +134,17 @@ const getUserBorrowingRecords = async (req, res) => {
         const { id } = req.params;
         const connection = await getConnection();
         
-        // 检查用户是否存在
-        const [existing] = await connection.execute('SELECT uid FROM borrowers WHERE uid = ?', [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ error: '用户未找到' });
+        // 调用存储过程获取用户借阅记录
+        await connection.execute('CALL getUserBorrowingRecords(?, @result_code, @result_message)', [id]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
         }
         
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT br.*, b.title as book_title
             FROM borrowing_records br
@@ -195,12 +166,17 @@ const getUserFineRecords = async (req, res) => {
         const { id } = req.params;
         const connection = await getConnection();
         
-        // 检查用户是否存在
-        const [existing] = await connection.execute('SELECT uid FROM borrowers WHERE uid = ?', [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ error: '用户未找到' });
+        // 调用存储过程获取用户罚款记录
+        await connection.execute('CALL getUserFineRecords(?, @result_code, @result_message)', [id]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
         }
         
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT fr.*, b.title as book_title
             FROM fine_records fr
