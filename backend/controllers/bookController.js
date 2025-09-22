@@ -4,6 +4,15 @@ const { getConnection } = require('../config/database');
 const getAllBooks = async (req, res) => {
     try {
         const connection = await getConnection();
+        // 调用存储过程获取所有图书
+        await connection.execute('CALL getAllBooks(@result_code, @result_message)');
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute('SELECT * FROM books');
         res.json(rows);
     } catch (error) {
@@ -17,6 +26,17 @@ const getBookById = async (req, res) => {
     try {
         const { id } = req.params;
         const connection = await getConnection();
+        // 调用存储过程根据ID获取图书
+        await connection.execute('CALL getBookById(?, @result_code, @result_message)', [id]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute('SELECT * FROM books WHERE book_id = ?', [id]);
         
         if (rows.length === 0) {
@@ -62,19 +82,20 @@ const updateBook = async (req, res) => {
         const { title, isbn, publisher_id, publication_year, total_stock, current_stock, location } = req.body;
         const connection = await getConnection();
         
-        // 检查图书是否存在
-        const [existing] = await connection.execute('SELECT book_id FROM books WHERE book_id = ?', [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ error: '图书未找到' });
+        // 调用存储过程更新图书信息
+        await connection.execute(
+            'CALL updateBook(?, ?, ?, ?, ?, ?, ?, ?, @result_code, @result_message)',
+            [id, title, isbn, publisher_id, publication_year, total_stock, current_stock, location]
+        );
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
         }
         
-        // 更新图书信息
-        const [result] = await connection.execute(
-            'UPDATE books SET title = ?, isbn = ?, publisher_id = ?, publication_year = ?, total_stock = ?, current_stock = ?, location = ? WHERE book_id = ?',
-            [title, isbn, publisher_id, publication_year, total_stock, current_stock, location, id]
-        );
-        
-        res.json({ message: '图书更新成功', affectedRows: result.affectedRows });
+        res.json({ message: result[0].result_message, affectedRows: 1 });
     } catch (error) {
         console.error('更新图书失败:', error);
         res.status(500).json({ error: '更新图书失败' });
@@ -87,16 +108,17 @@ const deleteBook = async (req, res) => {
         const { id } = req.params;
         const connection = await getConnection();
         
-        // 检查图书是否存在
-        const [existing] = await connection.execute('SELECT book_id FROM books WHERE book_id = ?', [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ error: '图书未找到' });
+        // 调用存储过程删除图书
+        await connection.execute('CALL deleteBook(?, @result_code, @result_message)', [id]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code === 1) {
+            return res.status(404).json({ error: result[0].result_message });
+        } else if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
         }
         
-        // 删除图书
-        const [result] = await connection.execute('DELETE FROM books WHERE book_id = ?', [id]);
-        
-        res.json({ message: '图书删除成功', affectedRows: result.affectedRows });
+        res.json({ message: result[0].result_message, affectedRows: 1 });
     } catch (error) {
         console.error('删除图书失败:', error);
         res.status(500).json({ error: '删除图书失败' });
@@ -109,7 +131,15 @@ const searchBooks = async (req, res) => {
         const { query } = req.params;
         const connection = await getConnection();
         
-        // 搜索图书（按书名、ISBN、作者名）
+        // 调用存储过程搜索图书
+        await connection.execute('CALL searchBooks(?, @result_code, @result_message)', [query]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT DISTINCT b.*, p.publisher_name
             FROM books b
