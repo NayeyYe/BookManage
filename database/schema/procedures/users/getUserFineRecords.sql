@@ -10,7 +10,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SET p_result_code = -1;
-        SET p_result_message = '系统错误：查询失败';
+        SET p_result_message = '系统错误：查询用户罚款记录失败';
     END;
     
     -- 初始化返回值
@@ -20,17 +20,10 @@ BEGIN
     -- 检查用户是否存在
     IF NOT EXISTS (SELECT 1 FROM borrowers WHERE uid = p_user_id) THEN
         SET p_result_code = 1;
-        SET p_result_message = '用户不存在';
+        SET p_result_message = '用户未找到';
     ELSE
         -- 查询用户罚款记录
-        SELECT 
-            fr.fine_id,
-            b.title AS book_title,
-            fr.borrow_date,
-            fr.due_date,
-            fr.overdue_days,
-            fr.fine_amount,
-            fr.payment_status
+        SELECT fr.*, b.title as book_title
         FROM fine_records fr
         JOIN books b ON fr.book_id = b.book_id
         WHERE fr.borrower_id = p_user_id
