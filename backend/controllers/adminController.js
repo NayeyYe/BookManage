@@ -4,6 +4,15 @@ const { getConnection } = require('../config/database');
 const getAllBorrowingRecords = async (req, res) => {
     try {
         const connection = await getConnection();
+        // 调用存储过程获取所有借阅记录
+        await connection.execute('CALL getAllBorrowingRecordsDetailed(@result_code, @result_message)');
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT br.*, b.title as book_title, bo.name as borrower_name, bo.identity_type
             FROM borrowing_records br
@@ -22,6 +31,15 @@ const getAllBorrowingRecords = async (req, res) => {
 const getAllFineRecords = async (req, res) => {
     try {
         const connection = await getConnection();
+        // 调用存储过程获取所有罚款记录
+        await connection.execute('CALL getAllFineRecordsDetailed(@result_code, @result_message)');
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT fr.*, b.title as book_title, bo.name as borrower_name, bo.identity_type
             FROM fine_records fr
@@ -40,6 +58,15 @@ const getAllFineRecords = async (req, res) => {
 const getUserLoginLogs = async (req, res) => {
     try {
         const connection = await getConnection();
+        // 调用存储过程获取用户登录日志
+        await connection.execute('CALL getUserLoginLogs(@result_code, @result_message)');
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        if (result[0].result_code !== 0) {
+            return res.status(500).json({ error: result[0].result_message });
+        }
+        
+        // 获取实际查询结果
         const [rows] = await connection.execute(`
             SELECT ll.*, bo.name as user_name, bo.identity_type
             FROM login_logs ll
