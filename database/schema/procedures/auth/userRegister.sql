@@ -1,0 +1,64 @@
+DELIMITER //
+
+CREATE PROCEDURE userRegister(
+    IN p_uid VARCHAR(50),
+    IN p_name VARCHAR(100),
+    IN p_phone VARCHAR(20),
+    IN p_identity_type INT,
+    IN p_student_id VARCHAR(50),
+    IN p_employee_id VARCHAR(50),
+    IN p_password_hash VARCHAR(255),
+    IN p_registration_date DATE,
+    OUT p_result_code INT,
+    OUT p_result_message VARCHAR(255)
+)
+BEGIN
+    -- 声明异常处理
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_result_code = -1;
+        SET p_result_message = '系统错误：注册失败';
+    END;
+    
+    -- 初始化返回值
+    SET p_result_code = 0;
+    SET p_result_message = '';
+    
+    -- 开始事务
+    START TRANSACTION;
+    
+    -- 检查用户ID是否已存在
+    IF EXISTS (SELECT 1 FROM borrowers WHERE uid = p_uid) THEN
+        SET p_result_code = 1;
+        SET p_result_message = '用户ID已存在';
+        ROLLBACK;
+    ELSE
+        -- 检查身份类型是否存在
+        IF NOT EXISTS (SELECT 1 FROM user_types WHERE type_id = p_identity_type) THEN
+            SET p_result_code = 2;
+            SET p_result_message = '身份类型不存在';
+            ROLLBACK;
+        ELSE
+            -- 插入用户信息
+            INSERT INTO borrowers (
+                uid, name, phone, identity_type, student_id, employee_id,
+                borrowed_count, registration_date, borrowing_status
+            ) VALUES (
+                p_uid, p_name, p_phone, p_identity_type, p_student_id, p_employee_id,
+                0, p_registration_date, 'active'
+            );
+            
+            -- 插入用户认证信息
+            INSERT INTO user_auth (user_id, password_hash) 
+            VALUES (p_uid, p_password_hash);
+            
+            -- 提交事务
+            COMMIT;
+            SET p_result_code = 0;
+            SET p_result_message = '用户注册成功';
+        END IF;
+    END IF;
+END//
+
+DELIMITER ;
