@@ -1,15 +1,23 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM 读取根目录.env文件中的环境变量
+if exist ..\.env (
+    for /f "tokens=1,2 delims==" %%a in (..\.env) do (
+        set "%%a=%%b"
+    )
+)
+
 REM 设置MySQL连接参数
-set MYSQL_HOST=localhost
-set MYSQL_USER=root
-set MYSQL_PASSWORD=
-set MYSQL_DATABASE=bookmanage
+set MYSQL_HOST=%DB_HOST%
+set MYSQL_USER=%DB_USER%
+set MYSQL_PASSWORD=%DB_PASSWORD%
+set MYSQL_DATABASE=%DB_NAME%
 
 REM 创建数据库
 echo Creating database...
-mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% -e "CREATE DATABASE IF NOT EXISTS %MYSQL_DATABASE%;"
+mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% -e "DROP DATABASE IF EXISTS %MYSQL_DATABASE%;"
+mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% -e "CREATE DATABASE IF NOT EXISTS %MYSQL_DATABASE% CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 REM 使用数据库
 echo Using database...

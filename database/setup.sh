@@ -1,14 +1,20 @@
 #!/bin/bash
 
+# 读取根目录.env文件中的环境变量
+if [ -f ../.env ]; then
+  export $(cat ../.env | xargs)
+fi
+
 # 设置MySQL连接参数
-MYSQL_HOST="localhost"
-MYSQL_USER="root"
-MYSQL_PASSWORD=""
-MYSQL_DATABASE="bookmanage"
+MYSQL_HOST="${DB_HOST:-localhost}"
+MYSQL_USER="${DB_USER:-root}"
+MYSQL_PASSWORD="${DB_PASSWORD:-13Password,}"
+MYSQL_DATABASE="${DB_NAME:-bookmanage}"
 
 # 创建数据库
 echo "Creating database..."
-mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
+mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% -e "DROP DATABASE IF EXISTS %MYSQL_DATABASE%;"
+mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 # 使用数据库
 echo "Using database..."
