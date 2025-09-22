@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP FUNCTION IF EXISTS getOverdueDays;
 DELIMITER //
 
-CREATE FUNCTION getOverdueDays(p_due_date DATE, p_current_date DATE) 
+CREATE FUNCTION IF NOT EXISTS getOverdueDays(p_due_date DATE, p_current_date DATE) 
 RETURNS INT
 READS SQL DATA
 DETERMINISTIC

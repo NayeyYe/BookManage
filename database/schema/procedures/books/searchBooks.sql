@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS searchBooks;
 DELIMITER //
 
 CREATE PROCEDURE searchBooks(

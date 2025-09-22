@@ -1,4 +1,6 @@
-CREATE TABLE borrowing_records (
+USE bookmanage;
+DROP TABLE IF EXISTS borrowing_records;
+CREATE TABLE IF NOT EXISTS borrowing_records (
     record_id VARCHAR(50) PRIMARY KEY,
     borrower_id VARCHAR(50) NOT NULL,
     book_id VARCHAR(50) NOT NULL,

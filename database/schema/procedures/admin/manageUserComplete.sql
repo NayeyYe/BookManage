@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS manageUserComplete;
 DELIMITER //
 
-CREATE PROCEDURE manageUserComplete(
+CREATE PROCEDURE IF NOT EXISTS manageUserComplete(
     IN p_uid VARCHAR(50),
     IN p_action VARCHAR(20),
     OUT p_result_code INT,

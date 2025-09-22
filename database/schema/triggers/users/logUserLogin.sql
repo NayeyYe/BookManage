@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP TRIGGER IF EXISTS logUserLogin;
 DELIMITER //
 
 CREATE TRIGGER logUserLogin

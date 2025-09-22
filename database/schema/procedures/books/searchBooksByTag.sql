@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS searchBooksByTag;
 DELIMITER //
 
-CREATE PROCEDURE searchBooksByTag(
+CREATE PROCEDURE IF NOT EXISTS searchBooksByTag(
     IN p_tag_name VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

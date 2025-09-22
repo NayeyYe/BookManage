@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP FUNCTION IF EXISTS calculateFine;
 DELIMITER //
 
-CREATE FUNCTION calculateFine(p_overdue_days INT) 
+CREATE FUNCTION IF NOT EXISTS calculateFine(p_overdue_days INT) 
 RETURNS DECIMAL(10,2)
 READS SQL DATA
 DETERMINISTIC

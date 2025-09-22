@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getUserFineRecords;
 DELIMITER //
 
-CREATE PROCEDURE getUserFineRecords(
+CREATE PROCEDURE IF NOT EXISTS getUserFineRecords(
     IN p_user_id VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

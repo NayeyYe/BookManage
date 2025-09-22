@@ -1,6 +1,9 @@
+USE bookmanage;
+DROP TABLE IF EXISTS teachers;
+
 CREATE TABLE teachers (
     id VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(20) NOT NULL,
     employee_id VARCHAR(50) NOT NULL UNIQUE
 );
 

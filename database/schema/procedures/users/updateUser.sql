@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS updateUser;
 DELIMITER //
 
 CREATE PROCEDURE updateUser(

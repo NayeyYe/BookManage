@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getUserBorrowingRecords;
 DELIMITER //
 
 CREATE PROCEDURE getUserBorrowingRecords(

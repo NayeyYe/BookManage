@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP EVENT IF EXISTS dailyOverdueCheck;
 DELIMITER //
 
 CREATE EVENT dailyOverdueCheck

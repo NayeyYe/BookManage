@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getUserById;
 DELIMITER //
 
 CREATE PROCEDURE getUserById(

@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP TRIGGER IF EXISTS updateBorrowerStatus;
 DELIMITER //
 
 CREATE TRIGGER updateBorrowerStatus

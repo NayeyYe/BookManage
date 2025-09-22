@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS manageAdmin;
 DELIMITER //
 
-CREATE PROCEDURE manageAdmin(
+CREATE PROCEDURE IF NOT EXISTS manageAdmin(
     IN p_super_admin_id VARCHAR(50),
     IN p_admin_id VARCHAR(50),
     IN p_action VARCHAR(20), -- 'promote' (提升为管理员), 'demote' (降级为普通用户), 'freeze' (冻结), 'unfreeze' (解冻)

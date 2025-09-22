@@ -1,4 +1,6 @@
-CREATE TABLE user_auth (
+USE bookmanage;
+DROP TABLE IF EXISTS user_auth;
+CREATE TABLE IF NOT EXISTS user_auth (
     user_id VARCHAR(50) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
     is_admin TINYINT(1) DEFAULT 0 COMMENT '是否为管理员，0-普通用户，1-管理员',

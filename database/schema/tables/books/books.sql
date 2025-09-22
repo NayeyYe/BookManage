@@ -1,4 +1,6 @@
-CREATE TABLE books (
+USE bookmanage;
+DROP TABLE IF EXISTS books;
+CREATE TABLE IF NOT EXISTS books (
     book_id VARCHAR(50) PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     isbn VARCHAR(20),

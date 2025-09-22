@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getAllFineRecords;
 DELIMITER //
 
-CREATE PROCEDURE getAllFineRecords(
+CREATE PROCEDURE IF NOT EXISTS getAllFineRecords(
     IN p_admin_id VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

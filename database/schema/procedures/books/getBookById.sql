@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getBookById;
 DELIMITER //
 
-CREATE PROCEDURE getBookById(
+CREATE PROCEDURE IF NOT EXISTS getBookById(
     IN p_book_id VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

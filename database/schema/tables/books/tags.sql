@@ -1,4 +1,6 @@
-CREATE TABLE tags (
+USE bookmanage;
+DROP TABLE IF EXISTS tags;
+CREATE TABLE IF NOT EXISTS tags (
     tag_id VARCHAR(50) PRIMARY KEY,
     tag_name VARCHAR(100) NOT NULL UNIQUE
 );

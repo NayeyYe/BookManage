@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP TRIGGER IF EXISTS updateBookStock;
 DELIMITER //
 
 CREATE TRIGGER updateBookStock

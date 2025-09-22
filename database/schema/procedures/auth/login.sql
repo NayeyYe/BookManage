@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS login;
 DELIMITER //
 
-CREATE PROCEDURE login(
+CREATE PROCEDURE IF NOT EXISTS login(
     IN p_uid VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255),

@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getAllBorrowingRecords;
 DELIMITER //
 
-CREATE PROCEDURE getAllBorrowingRecords(
+CREATE PROCEDURE IF NOT EXISTS getAllBorrowingRecords(
     IN p_admin_id VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

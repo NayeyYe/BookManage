@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getAllBooks;
 DELIMITER //
 
-CREATE PROCEDURE getAllBooks(
+CREATE PROCEDURE IF NOT EXISTS getAllBooks(
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)
 )

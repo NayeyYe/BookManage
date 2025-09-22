@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS searchBooksByISBN;
 DELIMITER //
 
-CREATE PROCEDURE searchBooksByISBN(
+CREATE PROCEDURE IF NOT EXISTS searchBooksByISBN(
     IN p_isbn VARCHAR(20),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

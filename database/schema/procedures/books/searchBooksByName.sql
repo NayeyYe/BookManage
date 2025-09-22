@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS searchBooksByName;
 DELIMITER //
 
-CREATE PROCEDURE searchBooksByName(
+CREATE PROCEDURE IF NOT EXISTS searchBooksByName(
     IN p_book_name VARCHAR(200),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)

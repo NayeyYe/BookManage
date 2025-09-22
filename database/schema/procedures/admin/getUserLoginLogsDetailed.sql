@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS getUserLoginLogsDetailed;
 DELIMITER //
 
-CREATE PROCEDURE getUserLoginLogsDetailed(
+CREATE PROCEDURE IF NOT EXISTS getUserLoginLogsDetailed(
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255)
 )

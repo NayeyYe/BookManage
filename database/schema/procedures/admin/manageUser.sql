@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS manageUser;
 DELIMITER //
 
-CREATE PROCEDURE manageUser(
+CREATE PROCEDURE IF NOT EXISTS manageUser(
     IN p_admin_id VARCHAR(50),
     IN p_user_id VARCHAR(50),
     IN p_action VARCHAR(20), -- 'freeze' or 'unfreeze'

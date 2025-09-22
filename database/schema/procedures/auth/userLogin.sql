@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS userLogin;
 DELIMITER //
 
-CREATE PROCEDURE userLogin(
+CREATE PROCEDURE IF NOT EXISTS userLogin(
     IN p_user_id VARCHAR(50),
     IN p_password VARCHAR(255),
     OUT p_result_code INT,
@@ -16,13 +18,6 @@ BEGIN
     DECLARE v_borrowing_status VARCHAR(20);
     DECLARE v_identity_type INT;
     
-    -- 初始化返回值
-    SET p_result_code = 0;
-    SET p_result_message = '';
-    SET p_user_name = '';
-    SET p_user_type = '';
-    SET p_borrowing_status = '';
-    
     -- 声明异常处理
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
@@ -30,6 +25,13 @@ BEGIN
         SET p_result_code = -1;
         SET p_result_message = '系统错误';
     END;
+    
+    -- 初始化返回值
+    SET p_result_code = 0;
+    SET p_result_message = '';
+    SET p_user_name = '';
+    SET p_user_type = '';
+    SET p_borrowing_status = '';
     
     -- 检查用户是否存在
     SELECT ua.password_hash, b.name, b.borrowing_status, b.identity_type

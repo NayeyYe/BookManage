@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS userRegister;
 DELIMITER //
 
-CREATE PROCEDURE userRegister(
+CREATE PROCEDURE IF NOT EXISTS userRegister(
     IN p_uid VARCHAR(50),
     IN p_name VARCHAR(100),
     IN p_phone VARCHAR(20),

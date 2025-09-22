@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP EVENT IF EXISTS dailyFineCalculation;
 DELIMITER //
 
 CREATE EVENT dailyFineCalculation

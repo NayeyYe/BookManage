@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP EVENT IF EXISTS dailyCleanUp;
 DELIMITER //
 
 CREATE EVENT dailyCleanUp

@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP TRIGGER IF EXISTS checkBookAvailability;
 DELIMITER //
 
 CREATE TRIGGER checkBookAvailability

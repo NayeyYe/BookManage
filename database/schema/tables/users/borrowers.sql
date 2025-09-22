@@ -1,4 +1,6 @@
-CREATE TABLE borrowers (
+USE bookmanage;
+DROP TABLE IF EXISTS borrowers;
+CREATE TABLE IF NOT EXISTS borrowers (
     uid VARCHAR(50) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),

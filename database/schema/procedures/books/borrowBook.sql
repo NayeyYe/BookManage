@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS borrowBook;
 DELIMITER //
 
-CREATE PROCEDURE borrowBook(
+CREATE PROCEDURE IF NOT EXISTS borrowBook(
     IN p_borrower_id VARCHAR(50),
     IN p_book_id VARCHAR(50),
     IN p_borrow_date DATE,

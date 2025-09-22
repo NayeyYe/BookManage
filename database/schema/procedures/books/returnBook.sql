@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS returnBook;
 DELIMITER //
 
-CREATE PROCEDURE returnBook(
+CREATE PROCEDURE IF NOT EXISTS returnBook(
     IN p_record_id VARCHAR(50),
     OUT p_result_code INT,
     OUT p_result_message VARCHAR(255),

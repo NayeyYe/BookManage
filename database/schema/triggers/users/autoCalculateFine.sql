@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP TRIGGER IF EXISTS autoCalculateFine;
 DELIMITER //
 
 CREATE TRIGGER autoCalculateFine

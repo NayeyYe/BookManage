@@ -1,3 +1,5 @@
+USE bookmanage;
+DROP TABLE IF EXISTS students;
 CREATE TABLE students (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,

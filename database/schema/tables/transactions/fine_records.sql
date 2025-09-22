@@ -1,4 +1,6 @@
-CREATE TABLE fine_records (
+USE bookmanage;
+DROP TABLE IF EXISTS fine_records;
+CREATE TABLE IF NOT EXISTS fine_records (
     fine_id VARCHAR(50) PRIMARY KEY,
     borrowing_record_id VARCHAR(50) NOT NULL,
     borrower_id VARCHAR(50) NOT NULL,

@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP FUNCTION IF EXISTS getUserBorrowedCount;
 DELIMITER //
 
-CREATE FUNCTION getUserBorrowedCount(p_user_id VARCHAR(50)) 
+CREATE FUNCTION IF NOT EXISTS getUserBorrowedCount(p_user_id VARCHAR(50)) 
 RETURNS INT
 READS SQL DATA
 DETERMINISTIC

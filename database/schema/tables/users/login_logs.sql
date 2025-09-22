@@ -1,4 +1,6 @@
-CREATE TABLE login_logs (
+USE bookmanage;
+DROP TABLE IF EXISTS login_logs;
+CREATE TABLE IF NOT EXISTS login_logs (
     log_id VARCHAR(50) PRIMARY KEY,
     user_id VARCHAR(50) NOT NULL,
     login_time DATETIME NOT NULL,

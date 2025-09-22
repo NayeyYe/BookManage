@@ -1,6 +1,8 @@
+USE bookmanage;
+DROP PROCEDURE IF EXISTS updateBook;
 DELIMITER //
 
-CREATE PROCEDURE updateBook(
+CREATE PROCEDURE IF NOT EXISTS updateBook(
     IN p_book_id VARCHAR(50),
     IN p_title VARCHAR(200),
     IN p_isbn VARCHAR(20),
