@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:setup": "node tests/setupTestDB.js",
+    "test:all": "npm run test:setup && npm test"
   },
   "keywords": [],
   "author": "",

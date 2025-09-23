@@ -97,9 +97,5 @@ echo Inserting seed data...
 mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% %MYSQL_DATABASE% < seeds/students.sql
 mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% %MYSQL_DATABASE% < seeds/teachers.sql
 
-REM 插入测试数据
-echo Inserting test data...
-mysql -h %MYSQL_HOST% -u %MYSQL_USER% -p%MYSQL_PASSWORD% %MYSQL_DATABASE% < seeds/test_data.sql
-
 echo Setup completed successfully!
 pause
