@@ -22,8 +22,8 @@ const getAllBorrowingRecords = async (req, res) => {
         `);
         res.json(rows);
     } catch (error) {
-        console.error('获取借阅记录失败:', error);
-        res.status(500).json({ error: '获取借阅记录失败' });
+        console.error('Failed to get borrowing records:', error);
+        res.status(500).json({ error: 'Failed to get borrowing records' });
     }
 };
 
@@ -49,17 +49,19 @@ const getAllFineRecords = async (req, res) => {
         `);
         res.json(rows);
     } catch (error) {
-        console.error('获取罚款记录失败:', error);
-        res.status(500).json({ error: '获取罚款记录失败' });
+        console.error('Failed to get fine records:', error);
+        res.status(500).json({ error: 'Failed to get fine records' });
     }
 };
 
 // 获取用户登录日志
 const getUserLoginLogs = async (req, res) => {
     try {
+        // Get admin ID from request query parameters or body
+        const admin_id = req.query.admin_id || (req.body && req.body.admin_id) || null;
         const connection = await getConnection();
         // 调用存储过程获取用户登录日志
-        await connection.execute('CALL getUserLoginLogs(@result_code, @result_message)');
+        await connection.execute('CALL getUserLoginLogs(?, @result_code, @result_message)', [admin_id]);
         const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
         
         if (result[0].result_code !== 0) {
@@ -75,8 +77,8 @@ const getUserLoginLogs = async (req, res) => {
         `);
         res.json(rows);
     } catch (error) {
-        console.error('获取登录日志失败:', error);
-        res.status(500).json({ error: '获取登录日志失败' });
+        console.error('Failed to get login logs:', error);
+        res.status(500).json({ error: 'Failed to get login logs' });
     }
 };
 
@@ -92,7 +94,7 @@ const manageUser = async (req, res) => {
                     'UPDATE borrowers SET borrowing_status = "active" WHERE uid = ?',
                     [uid]
                 );
-                res.json({ message: '用户已激活' });
+                res.json({ message: 'User activated' });
                 break;
                 
             case 'suspend':
@@ -100,60 +102,66 @@ const manageUser = async (req, res) => {
                     'UPDATE borrowers SET borrowing_status = "suspended" WHERE uid = ?',
                     [uid]
                 );
-                res.json({ message: '用户已冻结' });
+                res.json({ message: 'User suspended' });
                 break;
                 
             case 'delete':
                 // 开始事务
-                await connection.beginTransaction();
+                const conn = await connection.getConnection();
                 
                 try {
                     // 删除用户认证信息
-                    await connection.execute(
+                    await conn.beginTransaction();
+
+                    // 删除用户借阅记录
+                    await conn.execute(
                         'DELETE FROM user_auth WHERE user_id = ?',
                         [uid]
                     );
-                    
+
                     // 删除用户借阅记录
-                    await connection.execute(
+                    await conn.execute(
                         'DELETE FROM borrowing_records WHERE borrower_id = ?',
                         [uid]
                     );
-                    
+
                     // 删除用户罚款记录
-                    await connection.execute(
+                    await conn.execute(
                         'DELETE FROM fine_records WHERE borrower_id = ?',
                         [uid]
                     );
-                    
+
                     // 删除用户登录日志
-                    await connection.execute(
+                    await conn.execute(
                         'DELETE FROM login_logs WHERE user_id = ?',
                         [uid]
                     );
-                    
+
                     // 删除用户
-                    await connection.execute(
+                    await conn.execute(
                         'DELETE FROM borrowers WHERE uid = ?',
                         [uid]
                     );
-                    
+
                     // 提交事务
-                    await connection.commit();
-                    res.json({ message: '用户已删除' });
+                    await conn.commit();
+                    res.json({ message: 'User deleted' });
                 } catch (error) {
                     // 回滚事务
-                    await connection.rollback();
+                    await conn.rollback();
                     throw error;
+                } finally {
+                    // Release connection
+                    conn.release();
                 }
                 break;
                 
             default:
-                res.status(400).json({ error: '无效的操作' });
+                res.status(400).json({ error: 'Invalid action' });
         }
     } catch (error) {
-        console.error('管理用户失败:', error);
-        res.status(500).json({ error: '管理用户失败' });
+        console.error('Failed to manage user:', error);
+        res.status(500).json({ error: 'Failed to manage user' });
     }
 };
 
@@ -162,10 +170,10 @@ const manageAdmin = async (req, res) => {
     try {
         // 这里可以添加管理员管理功能
         // 例如：添加管理员、删除管理员、修改管理员权限等
-        res.status(500).json({ error: '管理员管理功能尚未实现' });
+        res.status(500).json({ error: 'Admin management feature not implemented' });
     } catch (error) {
-        console.error('管理管理员失败:', error);
-        res.status(500).json({ error: '管理管理员失败' });
+        console.error('Failed to manage admin:', error);
+        res.status(500).json({ error: 'Failed to manage admin' });
     }
 };
 
