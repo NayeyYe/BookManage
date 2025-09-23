@@ -45,8 +45,8 @@ BEGIN
         SET p_result_code = 1;
         SET p_result_message = 'User does not exist';
     ELSE
-        -- 验证密码（这里假设密码在应用层已经哈希处理）
-        IF v_password_hash != p_password THEN
+        -- 验证密码（使用SHA256哈希）
+        IF v_password_hash != SHA2(p_password, 256) THEN
             SET p_result_code = 2;
             SET p_result_message = 'Incorrect password';
         ELSE

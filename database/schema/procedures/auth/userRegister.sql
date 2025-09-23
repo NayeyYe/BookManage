@@ -53,7 +53,7 @@ BEGIN
             
             -- 插入用户认证信息
             INSERT INTO user_auth (user_id, password_hash) 
-            VALUES (p_uid, p_password_hash);
+            VALUES (p_uid, SHA2(p_password_hash, 256));
             
             -- 提交事务
             COMMIT;
