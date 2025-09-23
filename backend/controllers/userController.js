@@ -1,5 +1,5 @@
 const { getConnection } = require('../config/database');
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 // 用户注册
@@ -8,12 +8,19 @@ const register = async (req, res) => {
         const { uid, name, phone, identity_type, student_id, employee_id, password } = req.body;
         const connection = await getConnection();
         
-        // 调用存储过程用户注册
+        // Get current date
+        const registration_date = new Date().toISOString().split('T')[0];
+        
+        console.log('Registering user with data:', { uid, name, phone, identity_type, student_id, employee_id, password, registration_date });
+        
+        // 调用存储过程用户注册，直接传递明文密码，让存储过程使用SHA2进行哈希
         await connection.execute(
-            'CALL userRegister(?, ?, ?, ?, ?, ?, ?, @result_code, @result_message)',
-            [uid, name, phone, identity_type, student_id, employee_id, password]
+            'CALL userRegister(?, ?, ?, ?, ?, ?, ?, ?, @result_code, @result_message)',
+            [uid, name, phone, identity_type, student_id, employee_id, password, registration_date]
         );
         const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        
+        console.log('Registration result:', result[0]);
         
         if (result[0].result_code !== 0) {
             return res.status(400).json({ error: result[0].result_message });
@@ -21,8 +28,8 @@ const register = async (req, res) => {
         
         res.status(201).json({ message: result[0].result_message });
     } catch (error) {
-        console.error('用户注册失败:', error);
-        res.status(500).json({ error: '用户注册失败' });
+        console.error('User registration failed:', error);
+        res.status(500).json({ error: 'User registration failed' });
     }
 };
 
@@ -32,21 +39,19 @@ const login = async (req, res) => {
         const { uid, password } = req.body;
         const connection = await getConnection();
         
+        // 直接传递明文密码给存储过程，让存储过程使用SHA2进行哈希
         // 调用存储过程用户登录
-        await connection.execute('CALL userLogin(?, ?, @result_code, @result_message, @user_data)', [uid, password]);
-        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message, @user_data as user_data');
+        await connection.execute('CALL userLogin(?, ?, @result_code, @result_message, @user_name, @user_type, @borrowing_status)', [uid, password]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message, @user_name as user_name, @user_type as user_type, @borrowing_status as borrowing_status');
         
         if (result[0].result_code !== 0) {
             return res.status(401).json({ error: result[0].result_message });
         }
-        
-        // 解析用户数据
-        const userData = JSON.parse(result[0].user_data);
-        
+
         // 生成JWT令牌
         const token = jwt.sign(
-            { uid: userData.uid, name: userData.name, identity_type: userData.identity_type },
-            process.env.JWT_SECRET,
+            { uid: uid, name: result[0].user_name, identity_type: result[0].user_type },
+            process.env.JWT_SECRET || 'default_secret_key',
             { expiresIn: '24h' }
         );
         
@@ -54,18 +59,15 @@ const login = async (req, res) => {
             message: result[0].result_message,
             token,
             user: {
-                uid: userData.uid,
-                name: userData.name,
-                phone: userData.phone,
-                identity_type: userData.identity_type,
-                identity_type_name: userData.identity_type_name,
-                borrowing_status: userData.borrowing_status,
-                borrowed_count: userData.borrowed_count
+                uid: uid,
+                name: result[0].user_name,
+                identity_type: result[0].user_type,
+                borrowing_status: result[0].borrowing_status
             }
         });
     } catch (error) {
-        console.error('用户登录失败:', error);
-        res.status(500).json({ error: '用户登录失败' });
+        console.error('User login failed:', error);
+        res.status(500).json({ error: 'User login failed' });
     }
 };
 
@@ -94,13 +96,13 @@ const getUserById = async (req, res) => {
         `, [id]);
         
         if (rows.length === 0) {
-            return res.status(404).json({ error: '用户未找到' });
+            return res.status(404).json({ error: 'User not found' });
         }
         
         res.json(rows[0]);
     } catch (error) {
-        console.error('获取用户信息失败:', error);
-        res.status(500).json({ error: '获取用户信息失败' });
+        console.error('Failed to get user information:', error);
+        res.status(500).json({ error: 'Failed to get user information' });
     }
 };
 
@@ -123,8 +125,8 @@ const updateUser = async (req, res) => {
         
         res.json({ message: result[0].result_message, affectedRows: 1 });
     } catch (error) {
-        console.error('更新用户信息失败:', error);
-        res.status(500).json({ error: '更新用户信息失败' });
+        console.error('Failed to update user information:', error);
+        res.status(500).json({ error: 'Failed to update user information' });
     }
 };
 
@@ -155,8 +157,8 @@ const getUserBorrowingRecords = async (req, res) => {
         
         res.json(rows);
     } catch (error) {
-        console.error('获取用户借阅记录失败:', error);
-        res.status(500).json({ error: '获取用户借阅记录失败' });
+        console.error('Failed to get user borrowing records:', error);
+        res.status(500).json({ error: 'Failed to get user borrowing records' });
     }
 };
 
@@ -187,8 +189,8 @@ const getUserFineRecords = async (req, res) => {
         
         res.json(rows);
     } catch (error) {
-        console.error('获取用户罚款记录失败:', error);
-        res.status(500).json({ error: '获取用户罚款记录失败' });
+        console.error('Failed to get user fine records:', error);
+        res.status(500).json({ error: 'Failed to get user fine records' });
     }
 };
 
