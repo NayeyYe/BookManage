@@ -15,13 +15,11 @@ BEGIN
     
     -- 记录用户注册为登录事件
     INSERT INTO login_logs (
-        log_id, user_id, login_time, ip_address, login_status
+        log_id, user_id, login_time
     ) VALUES (
         CONCAT('L', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')), 
         NEW.user_id, 
-        NOW(), 
-        '127.0.0.1', 
-        'registered'
+        NOW()
     );
 END//
 

@@ -19,7 +19,7 @@ BEGIN
     SET p_result_message = '';
     
     -- 获取用户登录日志
-    SELECT ll.*, bo.name as user_name, bo.identity_type
+    SELECT ll.log_id, ll.user_id, ll.login_time, bo.name as user_name, bo.identity_type
     FROM login_logs ll
     JOIN borrowers bo ON ll.user_id = bo.uid
     ORDER BY ll.login_time DESC;

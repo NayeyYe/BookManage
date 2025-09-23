@@ -38,9 +38,7 @@ BEGIN
         SELECT 
             ll.log_id,
             b.name AS user_name,
-            ll.login_time,
-            ll.ip_address,
-            ll.login_status
+            ll.login_time
         FROM login_logs ll
         JOIN borrowers b ON ll.user_id = b.uid
         ORDER BY ll.login_time DESC;
