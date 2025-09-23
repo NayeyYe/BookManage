@@ -8,7 +8,7 @@ const authenticateToken = async (req, res, next) => {
         const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
         
         if (!token) {
-            return res.status(401).json({ error: '访问令牌缺失' });
+            return res.status(401).json({ error: 'Access token missing' });
         }
         
         // 验证令牌
@@ -23,23 +23,23 @@ const authenticateToken = async (req, res, next) => {
         );
         
         if (users.length === 0) {
-            return res.status(401).json({ error: '用户不存在' });
+            return res.status(401).json({ error: 'User does not exist' });
         }
         
         next();
     } catch (error) {
         if (error.name === 'JsonWebTokenError') {
-            return res.status(403).json({ error: '无效的访问令牌' });
+            return res.status(403).json({ error: 'Invalid access token' });
         }
-        console.error('身份验证失败:', error);
-        res.status(500).json({ error: '身份验证失败' });
+        console.error('Authentication failed:', error);
+        res.status(500).json({ error: 'Authentication failed' });
     }
 };
 
 // 验证管理员权限
 const authenticateAdmin = async (req, res, next) => {
     try {
-        // 首先进行基本的身份验证
+        // First perform basic authentication
         await new Promise((resolve, reject) => {
             authenticateToken(req, res, (err) => {
                 if (err) reject(err);
@@ -47,7 +47,7 @@ const authenticateAdmin = async (req, res, next) => {
             });
         });
         
-        // 检查用户是否为管理员
+        // Check if user is an administrator
         const connection = await getConnection();
         const [admins] = await connection.execute(
             'SELECT user_id FROM user_auth WHERE user_id = ? AND is_admin = 1',
@@ -55,13 +55,13 @@ const authenticateAdmin = async (req, res, next) => {
         );
         
         if (admins.length === 0) {
-            return res.status(403).json({ error: '需要管理员权限' });
+            return res.status(403).json({ error: 'Admin permissions required' });
         }
         
         next();
     } catch (error) {
-        console.error('管理员身份验证失败:', error);
-        res.status(500).json({ error: '管理员身份验证失败' });
+        console.error('Admin authentication failed:', error);
+        res.status(500).json({ error: 'Admin authentication failed' });
     }
 };
 
