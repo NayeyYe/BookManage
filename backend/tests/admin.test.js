@@ -34,15 +34,15 @@ async function setupAdminTestDatabase() {
         
         // 为S001用户添加登录日志
         await connection.execute(`
-            INSERT INTO login_logs (user_id, login_time, login_status, ip_address) 
-            VALUES (?, NOW(), 'success', '192.168.1.100')
-        `, ['S001']);
+            INSERT INTO login_logs (log_id, user_id, login_time) 
+            VALUES (?, ?, NOW())
+        `, ['LOG_S001_' + Date.now(), 'S001']);
         
         // 为A001管理员添加登录日志
         await connection.execute(`
-            INSERT INTO login_logs (user_id, login_time, login_status, ip_address) 
-            VALUES (?, NOW(), 'success', '192.168.1.101')
-        `, ['A001']);
+            INSERT INTO login_logs (log_id, user_id, login_time) 
+            VALUES (?, ?, NOW())
+        `, ['LOG_A001_' + Date.now(), 'A001']);
         
         console.log('Admin test database setup completed');
     } catch (error) {
