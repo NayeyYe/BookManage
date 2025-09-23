@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../components/Home.vue'
-import Login from '../components/Login.vue'
-import Register from '../components/Register.vue'
-import BookSearch from '../components/BookSearch.vue'
-import BorrowingRecords from '../components/BorrowingRecords.vue'
-import FineRecords from '../components/FineRecords.vue'
-import AdminPanel from '../components/AdminPanel.vue'
-import ApiTest from '../components/ApiTest.vue'
+import Home from '../views/Home.vue'
+import Login from '../views/Login.vue'
+import Register from '../views/Register.vue'
+import Profile from '../views/Profile.vue'
+import BookSearch from '../views/BookSearch.vue'
+import BorrowingRecords from '../views/BorrowingRecords.vue'
+import FineRecords from '../views/FineRecords.vue'
+import AdminPanel from '../views/AdminPanel.vue'
+import ApiTest from '../views/ApiTest.vue'
 
 const routes = [
   {
@@ -23,6 +24,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
   },
   {
     path: '/search',
