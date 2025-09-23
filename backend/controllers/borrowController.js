@@ -6,18 +6,25 @@ const borrowBook = async (req, res) => {
         const { borrower_id, book_id } = req.body;
         const connection = await getConnection();
         
-        // 调用存储过程借书
-        await connection.execute('CALL borrowBook(?, ?, @result_code, @result_message)', [borrower_id, book_id]);
-        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message');
+        // Get current date
+        const borrow_date = new Date().toISOString().split('T')[0];
+        
+        console.log('Borrowing book with data:', { borrower_id, book_id, borrow_date });
+        
+        /// 调用存储过程借书
+        await connection.execute('CALL borrowBook(?, ?, ?, @result_code, @result_message, @record_id)', [borrower_id, book_id, borrow_date]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message, @record_id as record_id');
+        
+        console.log('Borrow result:', result[0]);
         
         if (result[0].result_code !== 0) {
             return res.status(400).json({ error: result[0].result_message });
         }
         
-        res.status(201).json({ message: result[0].result_message });
+        res.status(201).json({ message: result[0].result_message, recordId: result[0].record_id });
     } catch (error) {
-        console.error('借书失败:', error);
-        res.status(500).json({ error: '借书失败' });
+        console.error('Failed to borrow book:', error);
+        res.status(500).json({ error: 'Failed to borrow book' });
     }
 };
 
@@ -26,10 +33,10 @@ const returnBook = async (req, res) => {
     try {
         const { record_id } = req.body;
         const connection = await getConnection();
-        
+
         // 调用存储过程还书
-        await connection.execute('CALL returnBook(?, @result_code, @result_message, @overdue_days, @fine_amount)', [record_id]);
-        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message, @overdue_days as overdue_days, @fine_amount as fine_amount');
+        await connection.execute('CALL returnBook(?, @result_code, @result_message, @overdue_days, @fine_amount, @fine_record_id)', [record_id]);
+        const [result] = await connection.execute('SELECT @result_code as result_code, @result_message as result_message, @overdue_days as overdue_days, @fine_amount as fine_amount, @fine_record_id as fine_record_id');
         
         if (result[0].result_code !== 0) {
             return res.status(400).json({ error: result[0].result_message });
@@ -38,11 +45,12 @@ const returnBook = async (req, res) => {
         res.json({
             message: result[0].result_message,
             overdueDays: result[0].overdue_days,
-            fineAmount: result[0].fine_amount
+            fineAmount: result[0].fine_amount,
+            fineRecordId: result[0].fine_record_id
         });
     } catch (error) {
-        console.error('还书失败:', error);
-        res.status(500).json({ error: '还书失败' });
+        console.error('Failed to return book:', error);
+        res.status(500).json({ error: 'Failed to return book' });
     }
 };
 
@@ -59,8 +67,8 @@ const getAllBorrowingRecords = async (req, res) => {
         `);
         res.json(rows);
     } catch (error) {
-        console.error('获取借阅记录失败:', error);
-        res.status(500).json({ error: '获取借阅记录失败' });
+        console.error('Failed to get borrowing records:', error);
+        res.status(500).json({ error: 'Failed to get borrowing records' });
     }
 };
 
@@ -77,8 +85,8 @@ const getAllFineRecords = async (req, res) => {
         `);
         res.json(rows);
     } catch (error) {
-        console.error('获取罚款记录失败:', error);
-        res.status(500).json({ error: '获取罚款记录失败' });
+        console.error('Failed to get fine records:', error);
+        res.status(500).json({ error: 'Failed to get fine records' });
     }
 };
 

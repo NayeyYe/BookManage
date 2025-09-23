@@ -17,6 +17,7 @@ BEGIN
     DECLARE v_due_date DATE;
     DECLARE v_actual_return_date DATE;
     DECLARE v_fine_record_id VARCHAR(50);
+    DECLARE v_return_status ENUM('returned', 'overdue');
     
     -- 声明异常处理
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -36,6 +37,7 @@ BEGIN
     SET p_fine_amount = 0.00;
     SET p_fine_record_id = '';
     SET v_fine_record_id = '';
+    SET v_return_status = 'returned';
     
     -- 开始事务
     START TRANSACTION;
@@ -55,10 +57,16 @@ BEGIN
         -- 计算逾期天数
         SET p_overdue_days = GREATEST(0, DATEDIFF(v_actual_return_date, v_due_date));
         
+        -- 设置归还状态
+        IF p_overdue_days > 0 THEN
+            SET v_return_status = 'overdue';
+        END IF;
+        
         -- 更新借阅记录的归还日期
         UPDATE borrowing_records 
         SET return_date = v_actual_return_date, 
-            actual_return_date = v_actual_return_date
+            actual_return_date = v_actual_return_date,
+            return_status = v_return_status
         WHERE record_id = p_record_id;
         
         -- 更新图书库存
@@ -80,11 +88,11 @@ BEGIN
             
             -- 插入罚款记录
             INSERT INTO fine_records (
-                record_id, borrower_id, book_id, borrow_date, return_date, 
-                overdue_days, fine_amount, payment_status
+                fine_id, borrowing_record_id, borrower_id, book_id, borrow_date, due_date,
+                overdue_days, return_status, fine_amount, payment_status
             ) VALUES (
-                v_fine_record_id, v_borrower_id, v_book_id, v_borrow_date, 
-                v_actual_return_date, p_overdue_days, p_fine_amount, 'unpaid'
+                v_fine_record_id, p_record_id, v_borrower_id, v_book_id, v_borrow_date, v_due_date,
+                p_overdue_days, v_return_status, p_fine_amount, 'unpaid'
             );
             
             SET p_fine_record_id = v_fine_record_id;

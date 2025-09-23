@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS borrowing_records (
     borrow_date DATE NOT NULL,
     due_date DATE NOT NULL,
     return_status ENUM('borrowed', 'returned', 'overdue') DEFAULT 'borrowed',
+    return_date DATE,
     actual_return_date DATE,
     overdue_days INT DEFAULT 0,
     FOREIGN KEY (borrower_id) REFERENCES borrowers(uid),

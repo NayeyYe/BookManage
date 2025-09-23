@@ -17,6 +17,7 @@ BEGIN
     DECLARE v_borrowing_status VARCHAR(20);
     DECLARE v_due_date DATE;
     DECLARE v_record_id VARCHAR(50);
+    DECLARE v_max_borrow_days INT;
     
     -- 声明异常处理
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -73,13 +74,13 @@ BEGIN
             SET v_record_id = CONCAT('BR', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'));
             
             -- 计算应还日期
-            SELECT max_borrow_days INTO v_due_date
+            SELECT max_borrow_days INTO v_max_borrow_days
             FROM user_types ut
             JOIN borrowers b ON ut.type_id = b.identity_type
             WHERE b.uid = p_borrower_id;
             
-            SET v_due_date = DATE_ADD(p_borrow_date, INTERVAL v_due_date DAY);
-            
+            SET v_due_date = DATE_ADD(p_borrow_date, INTERVAL v_max_borrow_days DAY);
+
             -- 插入借阅记录
             INSERT INTO borrowing_records (
                 record_id, borrower_id, book_id, borrow_date, due_date, return_status
