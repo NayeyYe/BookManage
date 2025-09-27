@@ -18,25 +18,18 @@
 - **Node.js** - JavaScript运行时
 - **Express** - Web应用框架
 - **MySQL** - 关系型数据库
-- **JWT** - 用户认证
 
 ## 本地运行步骤
 
 ### 环境要求
-- Node.js 16.0+
-- MySQL 5.7+
-- npm 8.0+
+- Node.js 22.0+
+- MySQL 8.0+
+- npm 11.6+
 
 ### 1. 数据库配置
 
 #### 安装MySQL
 ```bash
-# Windows (使用Chocolatey)
-choco install mysql
-
-# macOS (使用Homebrew)
-brew install mysql
-
 # Ubuntu/Debian
 sudo apt update
 sudo apt install mysql-server
@@ -47,23 +40,39 @@ sudo apt install mysql-server
 # Windows
 net start mysql
 
-# macOS
-brew services start mysql
-
 # Ubuntu/Debian
 sudo systemctl start mysql
 ```
 
+#### 配置环境变量
+
+创建 `.env` 文件：
+```
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=你的MySQL密码
+DB_NAME=bookmanage
+PORT=3000
+```
+
 #### 创建数据库
-```sql
--- 登录MySQL
+
+```bash
+-- 使用setup脚本
+cd database
+./setup.sh(或者./setup.bat)
+
+-- (可选)插入基本数据
+cd seeds
+```
+
+```mysql
+-- 登录mysql
 mysql -u root -p
 
--- 创建数据库
-CREATE DATABASE book_management;
-
--- 退出MySQL
-EXIT;
+-- 插入数据
+sources teachers.sql
+sources students.sql
 ```
 
 ### 2. 后端配置
@@ -76,23 +85,6 @@ cd backend
 #### 安装依赖
 ```bash
 npm install
-```
-
-#### 配置环境变量
-创建 `.env` 文件：
-```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=你的MySQL密码
-DB_NAME=book_management
-PORT=3000
-JWT_SECRET=your_jwt_secret_key
-```
-
-#### 初始化数据库
-```bash
-# 运行数据库迁移和种子数据
-npm run setup
 ```
 
 #### 启动后端服务
@@ -212,14 +204,15 @@ net start mysql  # Windows
 brew services start mysql  # macOS
 
 # 检查数据库配置
-# 确认 backend/.env 文件中的数据库配置正确
+# 确认根目录中.env 文件中的数据库配置正确
 
 # 重新创建数据库
-mysql -u root -p
-CREATE DATABASE book_management;
+cd database
+./setup.sh
 ```
 
 ### 2. 前端无法连接后端
+
 **问题**：前端显示"连接失败"或API请求错误
 
 **解决方案**：
